@@ -100,7 +100,9 @@ collect_r_defs <- function(r_files) {
       if (!is.symbol(lhs)) next
       nm <- as.character(lhs)
 
-      if (!is.call(rhs) || as.character(rhs[[1]]) != "function") next
+      if (!is.call(rhs)) next
+      fn_head <- tryCatch(as.character(rhs[[1]])[[1]], error = function(e) "")
+      if (!identical(fn_head, "function")) next
 
       sr <- attr(ex, "srcref")
       start_line <- NA_integer_
