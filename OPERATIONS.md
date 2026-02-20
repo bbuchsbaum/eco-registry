@@ -150,6 +150,19 @@ If users report install failure:
 3. Verify launcher exists at `~/.local/bin/eco-oracle-mcp-launch`.
 4. Verify MCP registration in Claude/Codex and run `eco_refresh`.
 
+## Package Bootstrap Operations
+
+Bootstrap script for package repos:
+- `scripts/bootstrap-package.sh`
+- one-liner:
+  - `curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/bootstrap-package.sh | bash`
+
+It scaffolds package-side onboarding files from `templates/`.
+If bootstrap appears incomplete:
+1. Confirm run location is package repo root (must contain `DESCRIPTION`).
+2. Confirm network access to raw GitHub templates.
+3. Re-run script; existing files are left untouched by design.
+
 ## Recovery Policy
 
 - Prefer rerunning discovery over manual edits.

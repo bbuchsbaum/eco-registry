@@ -26,6 +26,28 @@ If your local workspace has a parent folder (for example `eco-oracle/`), this re
 
 In the package repository:
 
+Fastest path (one command from package root):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/bootstrap-package.sh | bash
+```
+
+This scaffolds:
+- `.ecosystem.yml`
+- `.github/workflows/eco-atlas.yml`
+- `tools/eco_atlas_extract.R`
+- `tools/eco_atlas_distill.mjs`
+
+Then ask Claude Code:
+
+```text
+Run the EcoOracle bootstrap follow-through for this repo:
+1) verify .ecosystem.yml, eco-atlas workflow, and tools files are present
+2) commit and push only these onboarding files
+3) trigger eco-atlas workflow
+4) report the workflow run URL and whether release eco-atlas/atlas-pack.tgz exists
+```
+
 1. Add `.ecosystem.yml` at repo root.
 
 ```yaml
