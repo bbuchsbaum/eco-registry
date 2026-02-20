@@ -15,7 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_ORG_PAT }}  # PAT with read:org + repo scope
+          # Public-repo default: github.token is sufficient.
+          # Private-repo discovery: set GH_ORG_PAT and it will be preferred.
+          token: ${{ secrets.GH_ORG_PAT || github.token }}
 
       - uses: actions/setup-node@v4
         with:
@@ -23,7 +25,7 @@ jobs:
 
       - name: Discover ecosystem packages and update registry.json
         env:
-          GH_TOKEN: ${{ secrets.GH_ORG_PAT }}
+          GH_TOKEN: ${{ secrets.GH_ORG_PAT || github.token }}
           GH_OWNER: ${{ vars.ECO_OWNER }}     # preferred owner variable (org or user)
           GH_ORG: ${{ vars.ECO_ORG }}         # backward-compatible fallback
         run: node .github/scripts/discover.mjs
