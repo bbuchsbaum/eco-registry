@@ -19,8 +19,8 @@ if [[ -z "${pkg_name}" ]]; then
   exit 1
 fi
 
-default_role="${ECO_ROLE:-ingest}"
-default_tags="${ECO_TAGS:-bids,neuroimaging,fmri}"
+default_role="${ECO_ROLE:-transform}"
+default_tags="${ECO_TAGS:-domain-tag,workflow-tag}"
 
 mkdir -p .github/workflows tools
 
@@ -36,18 +36,23 @@ write_ecosystem_yml() {
     echo "ecosystem: true"
     echo "package: ${pkg_name}"
     echo "language: R"
+    echo "# REQUIRED: replace placeholders before commit"
+    echo "# role examples: ingest, clean, transform, model, io, viz"
     echo "role: ${default_role}"
     echo "tags:"
     for t in "${tags[@]}"; do
       tag_trimmed="$(echo "${t}" | xargs)"
       [[ -n "${tag_trimmed}" ]] && echo "  - ${tag_trimmed}"
     done
+    echo "# REQUIRED: add canonical exported functions used by consumers"
+    echo "# example: ${pkg_name}::main_fn"
     echo "entrypoints: []"
     echo "release_tag: eco-atlas"
     echo "asset: atlas-pack.tgz"
   } > .ecosystem.yml
 
   echo "[bootstrap] Wrote .ecosystem.yml"
+  echo "[bootstrap] IMPORTANT: update .ecosystem.yml role/tags/entrypoints before commit."
 }
 
 fetch_template() {
@@ -159,10 +164,11 @@ cat <<MSG
 [bootstrap] Done.
 
 Next steps:
-1. Commit and push these files.
-2. Trigger workflow (or push to main/master):
+1. Edit .ecosystem.yml with package-specific role, tags, and entrypoints.
+2. Commit and push these files.
+3. Trigger workflow (or push to main/master):
    gh workflow run eco-atlas.yml
-3. Trigger registry discovery:
+4. Trigger registry discovery:
    gh workflow run discover-registry.yml --repo bbuchsbaum/eco-registry
 
 Definition of done:

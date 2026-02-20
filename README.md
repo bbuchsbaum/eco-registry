@@ -59,6 +59,11 @@ The bootstrap script creates:
 - `tools/eco_atlas_extract.R`
 - `tools/eco_atlas_distill.mjs`
 
+Important: bootstrap uses placeholder metadata. Before commit, you must update `.ecosystem.yml`:
+- set a package-specific `role`
+- replace placeholder `tags`
+- add real exported `entrypoints` used by consumers
+
 ### Post-Bootstrap Verification
 
 Ask Claude Code to verify onboarding:
@@ -66,10 +71,11 @@ Ask Claude Code to verify onboarding:
 ```text
 Run the EcoOracle bootstrap follow-through for this repo:
 1) verify .ecosystem.yml, eco-atlas workflow, and tools files are present
-2) verify OPENAI_API_KEY GitHub secret is configured (using current shell env)
-3) commit and push only these onboarding files
-4) trigger eco-atlas workflow
-5) report the workflow run URL and whether release eco-atlas/atlas-pack.tgz exists
+2) update .ecosystem.yml with package-specific role, tags, and canonical entrypoints (no placeholders)
+3) verify OPENAI_API_KEY GitHub secret is configured (using current shell env)
+4) commit and push only these onboarding files
+5) trigger eco-atlas workflow
+6) report the workflow run URL and whether release eco-atlas/atlas-pack.tgz exists
 ```
 
 ### Manual Steps (If Not Using Bootstrap)
@@ -89,6 +95,10 @@ Run the EcoOracle bootstrap follow-through for this repo:
    release_tag: eco-atlas
    asset: atlas-pack.tgz
    ```
+
+   Mandatory quality rule:
+   - `role`, `tags`, and `entrypoints` must be package-specific.
+   - Do not leave defaults/placeholders (for example `domain-tag`, `workflow-tag`, `entrypoints: []`).
 
 2. Add the package atlas workflow and tooling from the `templates/` directory.
    Output should be user-facing usage knowledge, not package-maintainer-only internals.
