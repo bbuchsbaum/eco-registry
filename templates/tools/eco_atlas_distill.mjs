@@ -21,6 +21,23 @@ const MAX_CARDS = parseInt(process.env.ECO_ATLAS_MAX_CARDS_PER_SNIPPET || "2", 1
 const INCLUDE_TEST_CARDS = ["1", "true", "yes"].includes(
   String(process.env.ECO_ATLAS_INCLUDE_TEST_CARDS || "0").toLowerCase()
 );
+const MIN_CARDS = parsePositiveInt(process.env.ECO_ATLAS_MIN_CARDS, 1);
+const MIN_SYMBOLS = parsePositiveInt(process.env.ECO_ATLAS_MIN_SYMBOLS, 1);
+const ENFORCE_EXPORT_SYMBOLS = parseBooleanEnv(
+  process.env.ECO_ATLAS_ENFORCE_EXPORT_SYMBOLS,
+  true
+);
+const ENFORCE_ENTRYPOINTS = parseBooleanEnv(
+  process.env.ECO_ATLAS_ENFORCE_ENTRYPOINTS,
+  true
+);
+const ECOSYSTEM_PATH = process.env.ECO_ECOSYSTEM_PATH || ".ecosystem.yml";
+const NAMESPACE_PATH = process.env.ECO_NAMESPACE_PATH || "NAMESPACE";
+const INCLUDE_MANUAL_CARDS = parseBooleanEnv(
+  process.env.ECO_ATLAS_INCLUDE_MANUAL_CARDS,
+  true
+);
+const MANUAL_CARDS_PATH = process.env.ECO_ATLAS_MANUAL_CARDS_PATH || "manual_cards.jsonl";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 if (!OPENAI_API_KEY) { console.error("Missing OPENAI_API_KEY."); process.exit(1); }
@@ -89,6 +106,210 @@ function hasSymbolMention(recipe, symbols) {
 function looksLikeTestRecipe(recipe) {
   const code = recipe || "";
   return /(test_that\s*\(|expect_[a-z_]+\s*\(|stopifnot\s*\(|snapshot_)/i.test(code);
+}
+
+function parsePositiveInt(raw, fallback) {
+  const n = Number.parseInt(String(raw || ""), 10);
+  if (!Number.isFinite(n) || n <= 0) return fallback;
+  return n;
+}
+
+function parseBooleanEnv(raw, fallback) {
+  if (raw === undefined || raw === null || raw === "") return fallback;
+  const v = String(raw).toLowerCase();
+  return v === "1" || v === "true" || v === "yes";
+}
+
+function parseNamespaceExports(nsPath) {
+  if (!fs.existsSync(nsPath)) return [];
+  const raw = fs.readFileSync(nsPath, "utf8");
+  const out = [];
+  const matches = raw.matchAll(/export\s*\(([^)]*)\)/g);
+  for (const m of matches) {
+    const inside = m[1] || "";
+    for (const part of inside.split(",")) {
+      const trimmed = part.trim().replace(/^['"]|['"]$/g, "");
+      if (trimmed) out.push(trimmed);
+    }
+  }
+  return [...new Set(out)];
+}
+
+function parseEcosystemEntrypoints(ecoPath, pkg) {
+  if (!fs.existsSync(ecoPath)) return [];
+  const lines = fs.readFileSync(ecoPath, "utf8").split(/\r?\n/);
+  const out = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    const inline = trimmed.match(/^entrypoints:\s*\[(.*)\]\s*$/);
+    if (!inline) continue;
+    const inner = inline[1].trim();
+    if (!inner) return [];
+    for (const part of inner.split(",")) {
+      const normalized = normalizeEntrypoint(part, pkg);
+      if (normalized) out.push(normalized);
+    }
+    return [...new Set(out)];
+  }
+
+  let inEntrypoints = false;
+  for (const line of lines) {
+    if (!inEntrypoints) {
+      if (/^entrypoints:\s*$/.test(line.trim())) {
+        inEntrypoints = true;
+      }
+      continue;
+    }
+
+    if (/^\s*-\s+/.test(line)) {
+      const item = line.replace(/^\s*-\s+/, "").replace(/\s+#.*$/, "");
+      const normalized = normalizeEntrypoint(item, pkg);
+      if (normalized) out.push(normalized);
+      continue;
+    }
+
+    if (/^\s*$/.test(line)) continue;
+    if (!/^\s+/.test(line)) break;
+  }
+
+  return [...new Set(out)];
+}
+
+function normalizeEntrypoint(value, pkg) {
+  const raw = String(value || "").trim().replace(/^['"]|['"]$/g, "");
+  if (!raw) return "";
+  if (raw === "[]") return "";
+  if (raw.includes("::")) return raw;
+  return `${pkg}::${raw}`;
+}
+
+function validateAtlasContract({ manifest, symbols, cards }) {
+  const pkg = String(manifest?.package || "unknownpkg");
+  const failures = [];
+
+  if ((symbols || []).length < MIN_SYMBOLS) {
+    failures.push(`expected >= ${MIN_SYMBOLS} symbol card(s), got ${(symbols || []).length}`);
+  }
+
+  if ((cards || []).length < MIN_CARDS) {
+    failures.push(`expected >= ${MIN_CARDS} microcard(s), got ${(cards || []).length}`);
+  }
+
+  if (ENFORCE_EXPORT_SYMBOLS) {
+    const exports = parseNamespaceExports(NAMESPACE_PATH);
+    const symbolSet = new Set((symbols || []).map((s) => String(s.symbol || "")));
+    const missing = exports
+      .map((name) => `${pkg}::${name}`)
+      .filter((sym) => !symbolSet.has(sym));
+    if (missing.length > 0) {
+      failures.push(
+        `missing symbol cards for ${missing.length} exported function(s): ${missing.slice(0, 10).join(", ")}`
+      );
+    }
+  }
+
+  if (ENFORCE_ENTRYPOINTS) {
+    const entrypoints = parseEcosystemEntrypoints(ECOSYSTEM_PATH, pkg);
+    const covered = new Set();
+
+    for (const card of cards || []) {
+      for (const sym of card.symbols || []) covered.add(String(sym));
+    }
+
+    const missingEntrypoints = entrypoints.filter((ep) => !covered.has(ep));
+    if (missingEntrypoints.length > 0) {
+      failures.push(
+        `missing microcard coverage for ${missingEntrypoints.length} entrypoint(s): ${missingEntrypoints.slice(0, 10).join(", ")}`
+      );
+    }
+  }
+
+  if (failures.length > 0) {
+    throw new Error(`Atlas contract failed: ${failures.join(" | ")}`);
+  }
+}
+
+function normalizeSymbolForPackage(sym, pkg) {
+  const raw = String(sym || "").trim();
+  if (!raw) return "";
+  if (raw.includes("::")) return raw;
+  return `${pkg}::${raw}`;
+}
+
+function loadManualCards({ manifest, path: manualPath, allowedSymbols }) {
+  if (!INCLUDE_MANUAL_CARDS) return [];
+  if (!fs.existsSync(manualPath)) return [];
+
+  const pkg = String(manifest?.package || "unknownpkg");
+  const lang = String(manifest?.language || "R");
+  const out = [];
+  const lines = fs.readFileSync(manualPath, "utf8").split(/\r?\n/);
+  const allowedSet = new Set(allowedSymbols || []);
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    let rec;
+    try {
+      rec = JSON.parse(line);
+    } catch {
+      continue;
+    }
+
+    const symbols = Array.isArray(rec.symbols)
+      ? rec.symbols.map((s) => normalizeSymbolForPackage(s, pkg)).filter(Boolean)
+      : [];
+    if (symbols.length === 0) continue;
+
+    if (ENFORCE_EXPORT_SYMBOLS) {
+      const validSymbols = symbols.filter((s) => allowedSet.has(s));
+      if (validSymbols.length === 0) continue;
+      rec.symbols = validSymbols;
+    } else {
+      rec.symbols = symbols;
+    }
+
+    const q = String(rec.q || "").trim();
+    const a = String(rec.a || "").trim();
+    const recipe = String(rec.recipe || "").trim();
+    if (!q || !a || !recipe) continue;
+
+    const id = String(rec.id || `manual#${i + 1}`);
+    const tags = Array.isArray(rec.tags)
+      ? [...new Set(rec.tags.map((t) => String(t).trim().toLowerCase()).filter(Boolean))]
+      : [];
+
+    out.push({
+      id,
+      package: rec.package || pkg,
+      language: rec.language || lang,
+      q,
+      a,
+      recipe,
+      tags,
+      symbols: rec.symbols,
+      kind: "manual",
+      snippet_id: rec.snippet_id || null,
+      snippet_hash: rec.snippet_hash || null,
+      sources: Array.isArray(rec.sources) && rec.sources.length > 0
+        ? rec.sources
+        : [{ path: manualPath, lines: [i + 1, i + 1] }]
+    });
+  }
+
+  return out;
+}
+
+function dedupeCardsById(cards) {
+  const byId = new Map();
+  for (let i = 0; i < cards.length; i++) {
+    const rec = cards[i];
+    const id = String(rec.id || `generated#${i + 1}`);
+    byId.set(id, { ...rec, id });
+  }
+  return Array.from(byId.values());
 }
 
 const symbols  = readJsonl(SYMBOLS_PATH);
@@ -256,5 +477,23 @@ const allCards = [];
 for (const snip of snippets) {
   for (const c of cache[snip.hash] || []) allCards.push(c);
 }
-writeJsonl(CARDS_PATH, allCards);
-console.error(`Wrote ${allCards.length} total microcards to ${CARDS_PATH}`);
+const manualCards = loadManualCards({
+  manifest,
+  path: MANUAL_CARDS_PATH,
+  allowedSymbols: exportedSymbols
+});
+const mergedCards = dedupeCardsById([...allCards, ...manualCards]);
+writeJsonl(CARDS_PATH, mergedCards);
+try {
+  validateAtlasContract({
+    manifest,
+    symbols,
+    cards: mergedCards
+  });
+} catch (e) {
+  console.error(e.message);
+  process.exit(1);
+}
+console.error(
+  `Wrote ${mergedCards.length} total microcards to ${CARDS_PATH} (${manualCards.length} manual)`
+);
