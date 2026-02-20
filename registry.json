@@ -40,6 +40,22 @@
       "neuroim2::NeuroVol",
       "neuroim2::ClusteredNeuroVec"
     ],
-    "last_updated": "2026-02-20T01:51:55.254Z"
+    "last_updated": "2026-02-20T01:51:55.264Z"
+  },
+  {
+    "repo": "bbuchsbaum/fmrihrf",
+    "package": "fmrihrf",
+    "language": "R",
+    "release_tag": "eco-atlas",
+    "asset": "atlas-pack.tgz",
+    "atlas_asset_url": "https://github.com/bbuchsbaum/fmrihrf/releases/download/eco-atlas/atlas-pack.tgz",
+    "role": "ingest",
+    "tags": [
+      "bids",
+      "neuroimaging",
+      "fmri"
+    ],
+    "entrypoints": [],
+    "last_updated": "2026-02-20T03:33:27.000Z"
   }
 ]
