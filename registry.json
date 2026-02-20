@@ -18,7 +18,7 @@
       "bidser::read_events",
       "bidser::read_confounds"
     ],
-    "last_updated": "2026-02-20T04:35:32.343Z"
+    "last_updated": "2026-02-20T11:26:20.739Z"
   },
   {
     "repo": "bbuchsbaum/fmrihrf",
@@ -72,7 +72,45 @@
       "fmrihrf::plot_hrfs",
       "fmrihrf::list_available_hrfs"
     ],
-    "last_updated": "2026-02-20T04:35:36.131Z"
+    "last_updated": "2026-02-20T11:26:23.758Z"
+  },
+  {
+    "repo": "bbuchsbaum/neuroatlas",
+    "package": "neuroatlas",
+    "language": "R",
+    "release_tag": "eco-atlas",
+    "asset": "atlas-pack.tgz",
+    "atlas_asset_url": "",
+    "role": "ingest",
+    "tags": [
+      "neuroimaging",
+      "atlas",
+      "parcellation",
+      "mni",
+      "templateflow",
+      "surface",
+      "schaefer",
+      "glasser",
+      "freesurfer",
+      "roi",
+      "visualization"
+    ],
+    "entrypoints": [
+      "get_schaefer_atlas",
+      "get_glasser_atlas",
+      "get_aseg_atlas",
+      "get_olsen_mtl",
+      "get_template",
+      "map_atlas",
+      "reduce_atlas",
+      "get_roi",
+      "dilate_atlas",
+      "plot_brain",
+      "cluster_explorer",
+      "merge_atlases",
+      "filter_atlas"
+    ],
+    "last_updated": "2026-02-20T11:26:28.117Z"
   },
   {
     "repo": "bbuchsbaum/neuroim2",
@@ -95,5 +133,32 @@
       "neuroim2::ClusteredNeuroVec"
     ],
     "last_updated": "2026-02-20T01:51:55.264Z"
+  },
+  {
+    "repo": "bbuchsbaum/parade",
+    "package": "parade",
+    "language": "R",
+    "release_tag": "eco-atlas",
+    "asset": "atlas-pack.tgz",
+    "atlas_asset_url": "",
+    "role": "orchestrate",
+    "tags": [
+      "parallel",
+      "dataflow",
+      "hpc",
+      "slurm",
+      "future"
+    ],
+    "entrypoints": [
+      "parade::flow",
+      "parade::stage",
+      "parade::distribute",
+      "parade::collect",
+      "parade::pipeline",
+      "parade::submit_slurm",
+      "parade::grid",
+      "parade::schema"
+    ],
+    "last_updated": "2026-02-20T11:26:29.587Z"
   }
 ]
