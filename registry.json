@@ -18,7 +18,32 @@
       "bidser::read_events",
       "bidser::read_confounds"
     ],
-    "last_updated": "2026-02-20T12:01:25.459Z"
+    "last_updated": "2026-02-20T13:14:06.259Z"
+  },
+  {
+    "repo": "bbuchsbaum/fmridesign",
+    "package": "fmridesign",
+    "language": "R",
+    "release_tag": "eco-atlas",
+    "asset": "atlas-pack.tgz",
+    "atlas_asset_url": "https://github.com/bbuchsbaum/fmridesign/releases/download/eco-atlas/atlas-pack.tgz",
+    "role": "model",
+    "tags": [
+      "fmri",
+      "neuroimaging",
+      "design-matrix",
+      "hrf",
+      "glm"
+    ],
+    "entrypoints": [
+      "fmridesign::event_model",
+      "fmridesign::baseline_model",
+      "fmridesign::design_matrix",
+      "fmridesign::hrf",
+      "fmridesign::sampling_frame",
+      "fmridesign::contrast_weights"
+    ],
+    "last_updated": "2026-02-20T13:14:10.513Z"
   },
   {
     "repo": "bbuchsbaum/fmrihrf",
@@ -72,7 +97,7 @@
       "fmrihrf::plot_hrfs",
       "fmrihrf::list_available_hrfs"
     ],
-    "last_updated": "2026-02-20T12:01:28.712Z"
+    "last_updated": "2026-02-20T13:14:11.929Z"
   },
   {
     "repo": "bbuchsbaum/neuroatlas",
@@ -110,7 +135,7 @@
       "merge_atlases",
       "filter_atlas"
     ],
-    "last_updated": "2026-02-20T12:01:33.592Z"
+    "last_updated": "2026-02-20T13:14:19.283Z"
   },
   {
     "repo": "bbuchsbaum/neuroim2",
@@ -159,6 +184,6 @@
       "parade::grid",
       "parade::schema"
     ],
-    "last_updated": "2026-02-20T12:01:35.473Z"
+    "last_updated": "2026-02-20T13:14:22.035Z"
   }
 ]
