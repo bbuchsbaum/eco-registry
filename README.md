@@ -32,6 +32,13 @@ Fastest path (one command from package root):
 curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/bootstrap-package.sh | bash
 ```
 
+If `eco-registry` is private (current setup), use authenticated GitHub CLI instead:
+
+```bash
+gh api "repos/bbuchsbaum/eco-registry/contents/scripts/bootstrap-package.sh?ref=main" \
+  -H "Accept: application/vnd.github.raw" | bash
+```
+
 This scaffolds:
 - `.ecosystem.yml`
 - `.github/workflows/eco-atlas.yml`

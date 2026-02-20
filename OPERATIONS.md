@@ -156,6 +156,8 @@ Bootstrap script for package repos:
 - `scripts/bootstrap-package.sh`
 - one-liner:
   - `curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/bootstrap-package.sh | bash`
+ - private-repo one-liner:
+   - `gh api "repos/bbuchsbaum/eco-registry/contents/scripts/bootstrap-package.sh?ref=main" -H "Accept: application/vnd.github.raw" | bash`
 
 It scaffolds package-side onboarding files from `templates/`.
 If bootstrap appears incomplete:

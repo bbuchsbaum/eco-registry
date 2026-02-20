@@ -2,6 +2,8 @@
 set -euo pipefail
 
 REPO_RAW_BASE="https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main"
+REPO_OWNER_REPO="bbuchsbaum/eco-registry"
+REPO_REF="${ECO_REGISTRY_REF:-main}"
 
 if [[ ! -f "DESCRIPTION" ]]; then
   echo "[bootstrap] ERROR: DESCRIPTION not found. Run this from an R package repo root." >&2
@@ -52,6 +54,21 @@ fetch_template() {
     echo "[bootstrap] ${local_path} already exists; leaving as-is."
     return
   fi
+  if command -v gh >/dev/null 2>&1; then
+    if gh api "repos/${REPO_OWNER_REPO}/contents/${remote_path}?ref=${REPO_REF}" \
+      -H "Accept: application/vnd.github.raw" > "${local_path}" 2>/dev/null; then
+      echo "[bootstrap] Wrote ${local_path} (via gh api)"
+      return
+    fi
+  fi
+
+  if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+    curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+      "${REPO_RAW_BASE}/${remote_path}" -o "${local_path}"
+    echo "[bootstrap] Wrote ${local_path} (via token-auth curl)"
+    return
+  fi
+
   curl -fsSL "${REPO_RAW_BASE}/${remote_path}" -o "${local_path}"
   echo "[bootstrap] Wrote ${local_path}"
 }
