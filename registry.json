@@ -18,7 +18,61 @@
       "bidser::read_events",
       "bidser::read_confounds"
     ],
-    "last_updated": "2026-02-20T02:18:11.129Z"
+    "last_updated": "2026-02-20T04:29:27.018Z"
+  },
+  {
+    "repo": "bbuchsbaum/fmrihrf",
+    "package": "fmrihrf",
+    "language": "R",
+    "release_tag": "eco-atlas",
+    "asset": "atlas-pack.tgz",
+    "atlas_asset_url": "https://github.com/bbuchsbaum/fmrihrf/releases/download/eco-atlas/atlas-pack.tgz",
+    "role": "model",
+    "tags": [
+      "hemodynamic",
+      "regressor",
+      "hrf",
+      "convolve",
+      "neuroimaging",
+      "fmri",
+      "glm",
+      "design-matrix",
+      "bold",
+      "basis-set"
+    ],
+    "entrypoints": [
+      "fmrihrf::regressor",
+      "fmrihrf::single_trial_regressor",
+      "fmrihrf::sampling_frame",
+      "fmrihrf::evaluate",
+      "fmrihrf::getHRF",
+      "fmrihrf::gen_hrf",
+      "fmrihrf::HRF_SPMG1",
+      "fmrihrf::HRF_SPMG2",
+      "fmrihrf::HRF_SPMG3",
+      "fmrihrf::HRF_GAMMA",
+      "fmrihrf::HRF_GAUSSIAN",
+      "fmrihrf::HRF_BSPLINE",
+      "fmrihrf::HRF_FIR",
+      "fmrihrf::as_hrf",
+      "fmrihrf::bind_basis",
+      "fmrihrf::hrf_set",
+      "fmrihrf::hrf_library",
+      "fmrihrf::lag_hrf",
+      "fmrihrf::block_hrf",
+      "fmrihrf::normalise_hrf",
+      "fmrihrf::empirical_hrf",
+      "fmrihrf::hrf_bspline_generator",
+      "fmrihrf::hrf_fir_generator",
+      "fmrihrf::hrf_fourier_generator",
+      "fmrihrf::hrf_tent_generator",
+      "fmrihrf::hrf_lwu",
+      "fmrihrf::hrf_boxcar",
+      "fmrihrf::hrf_weighted",
+      "fmrihrf::plot_hrfs",
+      "fmrihrf::list_available_hrfs"
+    ],
+    "last_updated": "2026-02-20T04:29:29.724Z"
   },
   {
     "repo": "bbuchsbaum/neuroim2",
@@ -41,21 +95,5 @@
       "neuroim2::ClusteredNeuroVec"
     ],
     "last_updated": "2026-02-20T01:51:55.264Z"
-  },
-  {
-    "repo": "bbuchsbaum/fmrihrf",
-    "package": "fmrihrf",
-    "language": "R",
-    "release_tag": "eco-atlas",
-    "asset": "atlas-pack.tgz",
-    "atlas_asset_url": "https://github.com/bbuchsbaum/fmrihrf/releases/download/eco-atlas/atlas-pack.tgz",
-    "role": "ingest",
-    "tags": [
-      "bids",
-      "neuroimaging",
-      "fmri"
-    ],
-    "entrypoints": [],
-    "last_updated": "2026-02-20T03:33:27.000Z"
   }
 ]
