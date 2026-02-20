@@ -5,6 +5,11 @@ Canonical repository: `https://github.com/bbuchsbaum/eco-registry`
 This repository is the source of truth for ecosystem package discovery.
 It generates and publishes `registry.json`, which the EcoOracle MCP server consumes to help users write analysis scripts using ecosystem packages.
 
+This system is multi-tenant:
+- `eco-oracle-mcp` is generic runtime.
+- each ecosystem uses its own registry repo + `registry.json`.
+- users can consume this repo's ecosystem, or run their own by forking/copying this repo.
+
 ## System Overview
 
 1. A package repo opts in by adding `.ecosystem.yml` to its root.
@@ -35,10 +40,27 @@ From your R package repo root, run the bootstrap script:
 curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/bootstrap-package.sh | bash
 ```
 
+Using your own registry repo (fork or copy):
+
+```bash
+export ECO_REGISTRY_REPO="<your-org-or-user>/eco-registry"
+export ECO_REGISTRY_REF="main"
+curl -fsSL "https://raw.githubusercontent.com/${ECO_REGISTRY_REPO}/${ECO_REGISTRY_REF}/scripts/bootstrap-package.sh" | bash
+```
+
 If `eco-registry` is private, use the GitHub CLI instead:
 
 ```bash
 gh api "repos/bbuchsbaum/eco-registry/contents/scripts/bootstrap-package.sh?ref=main" \
+  -H "Accept: application/vnd.github.raw" | bash
+```
+
+Private + custom registry repo:
+
+```bash
+export ECO_REGISTRY_REPO="<your-org-or-user>/eco-registry"
+export ECO_REGISTRY_REF="main"
+gh api "repos/${ECO_REGISTRY_REPO}/contents/scripts/bootstrap-package.sh?ref=${ECO_REGISTRY_REF}" \
   -H "Accept: application/vnd.github.raw" | bash
 ```
 
@@ -109,13 +131,17 @@ Run the EcoOracle bootstrap follow-through for this repo:
 
 4. Push to `main` (or trigger the package workflow manually).
 
-5. Verify the release asset exists (tag: `eco-atlas`, asset: `atlas-pack.tgz`).
-
-6. Trigger discovery (or wait for nightly):
+5. Optional but recommended: verify the release asset exists (tag: `eco-atlas`, asset: `atlas-pack.tgz`).
 
    ```bash
-   gh workflow run discover-registry.yml --repo bbuchsbaum/eco-registry
+   gh release view eco-atlas --repo <owner>/<repo>
    ```
+
+6. Trigger discovery now for immediate availability (optional if you can wait for nightly):
+
+   ```bash
+gh workflow run discover-registry.yml --repo bbuchsbaum/eco-registry
+```
 
 7. Verify the package appears in `registry.json`.
 
@@ -138,6 +164,10 @@ ECO_INSTALL_TARGET=claude curl -fsSL ... | bash
 # Codex only
 ECO_INSTALL_TARGET=codex curl -fsSL ... | bash
 
+# Use your own registry repo defaults
+ECO_REGISTRY_REPO='<your-org-or-user>/eco-registry' ECO_REGISTRY_REF='main' \
+  curl -fsSL "https://raw.githubusercontent.com/<your-org-or-user>/eco-registry/main/scripts/install-eco-oracle-mcp.sh" | bash
+
 # Source-built server (if npm package is unavailable)
 ECO_MCP_EXEC='node /absolute/path/to/eco-oracle/packages/eco-oracle-mcp/dist/index.js' \
   curl -fsSL ... | bash
@@ -158,6 +188,8 @@ codex mcp add eco-oracle -- npx -y eco-oracle-mcp
 | Variable | Purpose |
 |----------|---------|
 | `ECO_REGISTRY_URL` | Registry URL (default: `https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/registry.json`) |
+| `ECO_REGISTRY_REPO` | Registry repo used by installer defaults (default: `bbuchsbaum/eco-registry`) |
+| `ECO_REGISTRY_REF` | Registry branch/tag for installer defaults (default: `main`) |
 | `ECO_GITHUB_TOKEN` | Optional; needed for private repos/assets |
 
 ### Typical Workflow
@@ -218,13 +250,13 @@ One JSON object per line. Required fields: `q`, `a`, `recipe`, `symbols`. Option
 
 - **Workflow:** `.github/workflows/discover-registry.yml`
 - **Schedule:** daily at 04:00 UTC
-- **Manual trigger:** `gh workflow run discover-registry.yml --repo bbuchsbaum/eco-registry`
+- **Manual trigger:** `gh workflow run discover-registry.yml --repo <owner>/eco-registry`
 
 ### Required Repository Settings
 
 | Setting | Type | Purpose |
 |---------|------|---------|
-| `GH_ORG_PAT` | Secret | Read repos under target owner; push commits to this repo |
+| `GH_ORG_PAT` | Secret (optional) | Needed for private-repo discovery; public-only can use `github.token` |
 | `ECO_OWNER` | Variable | Owner to scan (GitHub org or user, e.g. `bbuchsbaum`) |
 | `ECO_ORG` | Variable | Backward-compatible fallback for `ECO_OWNER` |
 

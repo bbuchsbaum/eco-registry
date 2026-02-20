@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_RAW_BASE="https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main"
-REPO_OWNER_REPO="bbuchsbaum/eco-registry"
+REPO_OWNER_REPO="${ECO_REGISTRY_REPO:-bbuchsbaum/eco-registry}"
 REPO_REF="${ECO_REGISTRY_REF:-main}"
+REPO_RAW_BASE="${ECO_REGISTRY_RAW_BASE:-https://raw.githubusercontent.com/${REPO_OWNER_REPO}/${REPO_REF}}"
 SET_SECRET_DEFAULT="${ECO_SET_OPENAI_SECRET:-1}"          # 1|0
 SECRET_SCOPE="${ECO_OPENAI_SECRET_SCOPE:-repo}"           # repo|org
 SECRET_NAME="${ECO_OPENAI_SECRET_NAME:-OPENAI_API_KEY}"
@@ -169,10 +169,10 @@ Next steps:
 3. Trigger workflow (or push to main/master):
    gh workflow run eco-atlas.yml
 4. Trigger registry discovery:
-   gh workflow run discover-registry.yml --repo bbuchsbaum/eco-registry
+   gh workflow run discover-registry.yml --repo ${REPO_OWNER_REPO}
 
 Definition of done:
 - Release tag eco-atlas contains atlas-pack.tgz
-- bbuchsbaum/eco-registry registry.json includes ${pkg_name}
+- ${REPO_OWNER_REPO} registry.json includes ${pkg_name}
 - eco_refresh shows package in MCP clients
 MSG

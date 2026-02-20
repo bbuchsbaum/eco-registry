@@ -5,7 +5,9 @@ SERVER_NAME="${ECO_MCP_SERVER_NAME:-eco-oracle}"
 INSTALL_TARGET="${ECO_INSTALL_TARGET:-both}" # claude|codex|both
 CLAUDE_SCOPE="${ECO_CLAUDE_SCOPE:-user}"     # user|project
 
-REGISTRY_URL_DEFAULT="https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/registry.json"
+REGISTRY_REPO="${ECO_REGISTRY_REPO:-bbuchsbaum/eco-registry}"
+REGISTRY_REF="${ECO_REGISTRY_REF:-main}"
+REGISTRY_URL_DEFAULT="https://raw.githubusercontent.com/${REGISTRY_REPO}/${REGISTRY_REF}/registry.json"
 REGISTRY_URL="${ECO_REGISTRY_URL:-$REGISTRY_URL_DEFAULT}"
 
 # Default runtime command (works once eco-oracle-mcp is published to npm).
