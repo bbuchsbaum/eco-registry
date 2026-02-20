@@ -5,7 +5,7 @@
     "language": "R",
     "release_tag": "eco-atlas",
     "asset": "atlas-pack.tgz",
-    "atlas_asset_url": "",
+    "atlas_asset_url": "https://github.com/bbuchsbaum/bidser/releases/download/eco-atlas/atlas-pack.tgz",
     "role": "ingest",
     "tags": [
       "bids",
@@ -18,7 +18,7 @@
       "bidser::read_events",
       "bidser::read_confounds"
     ],
-    "last_updated": "2026-02-20T11:26:20.739Z"
+    "last_updated": "2026-02-20T11:59:21.819Z"
   },
   {
     "repo": "bbuchsbaum/fmrihrf",
@@ -72,7 +72,7 @@
       "fmrihrf::plot_hrfs",
       "fmrihrf::list_available_hrfs"
     ],
-    "last_updated": "2026-02-20T11:26:23.758Z"
+    "last_updated": "2026-02-20T11:59:23.959Z"
   },
   {
     "repo": "bbuchsbaum/neuroatlas",
@@ -110,7 +110,7 @@
       "merge_atlases",
       "filter_atlas"
     ],
-    "last_updated": "2026-02-20T11:26:28.117Z"
+    "last_updated": "2026-02-20T11:59:27.277Z"
   },
   {
     "repo": "bbuchsbaum/neuroim2",
@@ -140,7 +140,7 @@
     "language": "R",
     "release_tag": "eco-atlas",
     "asset": "atlas-pack.tgz",
-    "atlas_asset_url": "",
+    "atlas_asset_url": "https://github.com/bbuchsbaum/parade/releases/download/eco-atlas/atlas-pack.tgz",
     "role": "orchestrate",
     "tags": [
       "parallel",
@@ -159,6 +159,6 @@
       "parade::grid",
       "parade::schema"
     ],
-    "last_updated": "2026-02-20T11:26:29.587Z"
+    "last_updated": "2026-02-20T11:59:28.560Z"
   }
 ]
