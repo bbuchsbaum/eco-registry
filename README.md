@@ -105,6 +105,33 @@ Use this URL in MCP config:
 
 `https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/registry.json`
 
+## Turnkey Client Install (One Command)
+
+From any remote machine, install and register the MCP server for Claude/Codex:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/install-eco-oracle-mcp.sh | bash
+```
+
+Installer behavior:
+- creates a launcher script at `~/.local/bin/eco-oracle-mcp-launch`
+- sets `ECO_REGISTRY_URL` to this registry
+- registers MCP server `eco-oracle` with Claude and Codex (if installed)
+
+Useful overrides:
+
+```bash
+# install for Claude only
+ECO_INSTALL_TARGET=claude curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/install-eco-oracle-mcp.sh | bash
+
+# install for Codex only
+ECO_INSTALL_TARGET=codex curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/install-eco-oracle-mcp.sh | bash
+
+# use a source-built server command (if npm package is unavailable)
+ECO_MCP_EXEC='node /absolute/path/to/eco-oracle/packages/eco-oracle-mcp/dist/index.js' \
+curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/install-eco-oracle-mcp.sh | bash
+```
+
 Claude Code example:
 
 ```bash

@@ -137,6 +137,19 @@ If registry changed, validate from an MCP client session:
 Registry URL for clients:
 - `https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/registry.json`
 
+## Turnkey Installer Operations
+
+Installer script:
+- `scripts/install-eco-oracle-mcp.sh`
+- public one-liner:
+  - `curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/install-eco-oracle-mcp.sh | bash`
+
+If users report install failure:
+1. Check if `eco-oracle-mcp` exists on npm.
+2. If not, instruct them to set `ECO_MCP_EXEC` to a source-built command.
+3. Verify launcher exists at `~/.local/bin/eco-oracle-mcp-launch`.
+4. Verify MCP registration in Claude/Codex and run `eco_refresh`.
+
 ## Recovery Policy
 
 - Prefer rerunning discovery over manual edits.
