@@ -158,8 +158,11 @@ Bootstrap script for package repos:
   - `curl -fsSL https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/scripts/bootstrap-package.sh | bash`
  - private-repo one-liner:
    - `gh api "repos/bbuchsbaum/eco-registry/contents/scripts/bootstrap-package.sh?ref=main" -H "Accept: application/vnd.github.raw" | bash`
+ - secure turnkey (auto secret setup):
+   - `read -s OPENAI_API_KEY; export OPENAI_API_KEY; gh api "repos/bbuchsbaum/eco-registry/contents/scripts/bootstrap-package.sh?ref=main" -H "Accept: application/vnd.github.raw" | bash; unset OPENAI_API_KEY`
 
 It scaffolds package-side onboarding files from `templates/`.
+If `OPENAI_API_KEY` is in shell env, bootstrap also configures repo secret automatically via `gh secret set`.
 If bootstrap appears incomplete:
 1. Confirm run location is package repo root (must contain `DESCRIPTION`).
 2. Confirm network access to raw GitHub templates.

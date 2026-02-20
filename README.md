@@ -39,6 +39,20 @@ gh api "repos/bbuchsbaum/eco-registry/contents/scripts/bootstrap-package.sh?ref=
   -H "Accept: application/vnd.github.raw" | bash
 ```
 
+Secure turnkey flow with automatic GitHub secret setup:
+
+```bash
+read -s OPENAI_API_KEY
+export OPENAI_API_KEY
+gh api "repos/bbuchsbaum/eco-registry/contents/scripts/bootstrap-package.sh?ref=main" \
+  -H "Accept: application/vnd.github.raw" | bash
+unset OPENAI_API_KEY
+```
+
+When `OPENAI_API_KEY` is present in shell env, bootstrap automatically runs:
+- `gh secret set OPENAI_API_KEY --repo <owner/repo>`
+- no manual GitHub UI step required
+
 This scaffolds:
 - `.ecosystem.yml`
 - `.github/workflows/eco-atlas.yml`
@@ -50,9 +64,10 @@ Then ask Claude Code:
 ```text
 Run the EcoOracle bootstrap follow-through for this repo:
 1) verify .ecosystem.yml, eco-atlas workflow, and tools files are present
-2) commit and push only these onboarding files
-3) trigger eco-atlas workflow
-4) report the workflow run URL and whether release eco-atlas/atlas-pack.tgz exists
+2) verify OPENAI_API_KEY GitHub secret is configured (using current shell env)
+3) commit and push only these onboarding files
+4) trigger eco-atlas workflow
+5) report the workflow run URL and whether release eco-atlas/atlas-pack.tgz exists
 ```
 
 1. Add `.ecosystem.yml` at repo root.
@@ -75,7 +90,8 @@ asset: atlas-pack.tgz
 The output should be user-facing usage knowledge, not package-maintainer-only internals.
 
 3. Configure package secret:
-- `OPENAI_API_KEY`
+- normally automatic if `OPENAI_API_KEY` is set before bootstrap
+- manual fallback: `gh secret set OPENAI_API_KEY --repo <owner/repo>`
 
 4. Push to `main` (or run package workflow manually).
 
