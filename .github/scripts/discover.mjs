@@ -4,22 +4,25 @@
  *
  * Requires:
  *   GH_TOKEN  — PAT with read:org + repo scope
- *   GH_ORG    — GitHub org name
+ *   GH_ORG or GH_OWNER — GitHub org/user owner name
+ * Optional:
+ *   GH_OWNER_KIND — "org" or "user" (auto-detected when omitted)
  */
 
 import fs from "node:fs";
 
 const TOKEN = process.env.GH_TOKEN;
-const ORG   = process.env.GH_ORG;
+const OWNER = process.env.GH_OWNER || process.env.GH_ORG;
+const OWNER_KIND_OVERRIDE = process.env.GH_OWNER_KIND;
 
-if (!TOKEN || !ORG) {
-  console.error("Missing GH_TOKEN or GH_ORG");
+if (!TOKEN || !OWNER) {
+  console.error("Missing GH_TOKEN and GH_OWNER/GH_ORG");
   process.exit(1);
 }
 
 const REGISTRY_PATH = "registry.json";
-const ATLAS_RELEASE_TAG = "eco-atlas";
-const ATLAS_ASSET_NAME  = "atlas-pack.tgz";
+const DEFAULT_ATLAS_RELEASE_TAG = "eco-atlas";
+const DEFAULT_ATLAS_ASSET_NAME  = "atlas-pack.tgz";
 
 async function ghGet(path) {
   const res = await fetch(`https://api.github.com${path}`, {
@@ -34,8 +37,41 @@ async function ghGet(path) {
   return res.json();
 }
 
+async function detectOwnerKind() {
+  if (OWNER_KIND_OVERRIDE === "org" || OWNER_KIND_OVERRIDE === "user") {
+    return OWNER_KIND_OVERRIDE;
+  }
+
+  const org = await ghGet(`/orgs/${OWNER}`);
+  if (org) return "org";
+
+  const user = await ghGet(`/users/${OWNER}`);
+  if (user) return "user";
+
+  throw new Error(`Could not resolve owner kind for ${OWNER}`);
+}
+
+function asBoolean(v) {
+  if (typeof v === "boolean") return v;
+  if (typeof v === "string") return ["true", "1", "yes", "on"].includes(v.toLowerCase());
+  return false;
+}
+
+function asLanguage(v) {
+  const raw = String(v || "").trim().toLowerCase();
+  if (raw === "r") return "R";
+  if (raw === "python" || raw === "py") return "Python";
+  return "";
+}
+
+function asStringArray(v) {
+  if (Array.isArray(v)) return v.map((x) => String(x).trim()).filter(Boolean);
+  if (typeof v === "string" && v.trim()) return [v.trim()];
+  return [];
+}
+
 async function getFileContent(repo, filePath) {
-  const data = await ghGet(`/repos/${ORG}/${repo}/contents/${filePath}`);
+  const data = await ghGet(`/repos/${OWNER}/${repo}/contents/${filePath}`);
   if (!data || data.type !== "file") return null;
   return Buffer.from(data.content, "base64").toString("utf-8");
 }
@@ -86,11 +122,13 @@ function parseEcosystemYml(text) {
   return result;
 }
 
-async function getAtlasAssetUrl(repo) {
-  const release = await ghGet(`/repos/${ORG}/${repo}/releases/tags/${ATLAS_RELEASE_TAG}`);
+async function getAtlasAssetUrl(repo, releaseTag, assetName) {
+  const release = await ghGet(
+    `/repos/${OWNER}/${repo}/releases/tags/${encodeURIComponent(releaseTag)}`
+  );
   if (!release) return null;
 
-  const asset = (release.assets || []).find((a) => a.name === ATLAS_ASSET_NAME);
+  const asset = (release.assets || []).find((a) => a.name === assetName);
   return asset ? asset.browser_download_url : null;
 }
 
@@ -104,11 +142,15 @@ async function validateAtlasUrl(url) {
   }
 }
 
-async function listOrgRepos() {
+async function listOwnerRepos(ownerKind) {
   const repos = [];
   let page = 1;
   while (true) {
-    const data = await ghGet(`/orgs/${ORG}/repos?per_page=100&page=${page}&type=all`);
+    const endpoint =
+      ownerKind === "org"
+        ? `/orgs/${OWNER}/repos?per_page=100&page=${page}&type=all`
+        : `/users/${OWNER}/repos?per_page=100&page=${page}&type=owner`;
+    const data = await ghGet(endpoint);
     if (!data || data.length === 0) break;
     repos.push(...data.map((r) => r.name));
     if (data.length < 100) break;
@@ -119,27 +161,32 @@ async function listOrgRepos() {
 
 // --- Main ---
 
-console.error(`[discover] Scanning ${ORG} for .ecosystem.yml...`);
+const ownerKind = await detectOwnerKind();
+console.error(`[discover] Scanning ${OWNER} (${ownerKind}) for .ecosystem.yml...`);
 
 const existing = JSON.parse(fs.readFileSync(REGISTRY_PATH, "utf-8"));
 const existingMap = new Map(existing.map((e) => [e.repo, e]));
 
-const repos = await listOrgRepos();
+const repos = await listOwnerRepos(ownerKind);
 console.error(`[discover] Found ${repos.length} repos`);
 
 const updated = [];
 let added = 0, unchanged = 0, failed = 0;
 
 for (const repo of repos) {
-  const fullName = `${ORG}/${repo}`;
+  const fullName = `${OWNER}/${repo}`;
   try {
     const content = await getFileContent(repo, ".ecosystem.yml");
     if (!content) continue;
 
     const cfg = parseEcosystemYml(content);
-    if (!cfg.ecosystem || cfg.language === undefined) continue;
+    const ecosystemEnabled = asBoolean(cfg.ecosystem);
+    const language = asLanguage(cfg.language);
+    if (!ecosystemEnabled || !language) continue;
 
-    const atlasUrl = await getAtlasAssetUrl(repo);
+    const releaseTag = String(cfg.release_tag || DEFAULT_ATLAS_RELEASE_TAG);
+    const assetName = String(cfg.asset || DEFAULT_ATLAS_ASSET_NAME);
+    const atlasUrl = await getAtlasAssetUrl(repo, releaseTag, assetName);
     const valid    = await validateAtlasUrl(atlasUrl);
 
     if (!valid && atlasUrl) {
@@ -149,11 +196,13 @@ for (const repo of repos) {
     const entry = {
       repo: fullName,
       package: cfg.package || repo,
-      language: cfg.language || "R",
-      atlas_asset_url: atlasUrl || "",
+      language,
+      release_tag: releaseTag,
+      asset: assetName,
+      atlas_asset_url: valid ? atlasUrl : "",
       role: cfg.role || null,
-      tags: Array.isArray(cfg.tags) ? cfg.tags : [],
-      entrypoints: Array.isArray(cfg.entrypoints) ? cfg.entrypoints : [],
+      tags: asStringArray(cfg.tags),
+      entrypoints: asStringArray(cfg.entrypoints),
       last_updated: new Date().toISOString(),
     };
 

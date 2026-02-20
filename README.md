@@ -1,48 +1,135 @@
 # eco-registry
 
-Central registry of packages participating in the internal R/Python package ecosystem.
+Canonical repository: `https://github.com/bbuchsbaum/eco-registry`
 
-## How it works
+This repository is the source of truth for ecosystem package discovery.
+It generates and publishes `registry.json`, which the EcoOracle MCP server consumes.
 
-1. Each package repo contains a `.ecosystem.yml` at its root.
-2. The `discover-registry.yml` GitHub Action scans all org repos for this file.
-3. Found packages are compiled into `registry.json` and committed automatically.
-4. EcoOracle downloads `registry.json` on startup to discover atlas pack URLs.
+## What This Repo Owns
 
-## registry.json format
+- `registry.json`: machine-readable list of ecosystem packages
+- `.github/scripts/discover.mjs`: discovery/generation logic
+- `.github/workflows/discover-registry.yml`: nightly + manual update workflow
 
-An array of registry entries:
+If your local workspace has a parent folder (for example `eco-oracle/`), this repo is still the actual git/GitHub root.
 
-```json
-[
-  {
-    "repo": "myorg/mypkg",
-    "package": "mypkg",
-    "language": "R",
-    "atlas_asset_url": "https://github.com/myorg/mypkg/releases/download/eco-atlas/atlas-pack.tgz",
-    "role": "ingest",
-    "tags": ["transactions", "canonicalization"],
-    "entrypoints": ["mypkg::canonicalize_transactions"],
-    "last_updated": "2026-02-19T00:00:00Z"
-  }
-]
+## System Overview
+
+1. Package repo opts in via `.ecosystem.yml`.
+2. Package CI publishes `atlas-pack.tgz` at release tag `eco-atlas`.
+3. This repo's discovery workflow scans all repos under an owner, finds `.ecosystem.yml`, resolves release assets, and writes `registry.json`.
+4. MCP clients read `registry.json` and load cards/symbols/edges from each package atlas.
+
+## Turnkey: Add Any New R Package
+
+In the package repository:
+
+1. Add `.ecosystem.yml` at repo root.
+
+```yaml
+ecosystem: true
+package: mypkg
+language: R
+role: transform
+tags: [domain-tag, canonicalization]
+entrypoints:
+  - mypkg::main_fn
+  - mypkg::read_input
+# optional overrides (defaults shown)
+release_tag: eco-atlas
+asset: atlas-pack.tgz
 ```
 
-## Adding a package
+2. Add package atlas workflow/tooling (from EcoOracle templates).
 
-From the package repo, ask your agent: **"Add this package to the ecosystem."**
+3. Configure package secret:
+- `OPENAI_API_KEY`
 
-The `eco-join` skill will scaffold all required files. After the PR merges and CI runs, the package appears in `registry.json` automatically within 24 hours (or trigger `workflow_dispatch` on this repo for immediate update).
+4. Push to `main` (or run package workflow manually).
 
-## Manual registration
+5. Verify package release asset exists:
+- tag: `eco-atlas`
+- asset: `atlas-pack.tgz`
 
-If you need to add a package manually, append an entry to `registry.json` following the schema above, then open a PR.
+6. Trigger discovery here (or wait nightly):
 
-## Validation
+```bash
+gh workflow run discover-registry.yml --repo bbuchsbaum/eco-registry
+```
 
-The discovery action validates:
-- `atlas_asset_url` is reachable (HTTP 200 or 302)
-- `manifest.json` inside the pack is parseable
-- Package name matches DESCRIPTION
+7. Verify package appears in `registry.json`.
 
-Packages that fail validation are logged but not removed from the registry (to avoid breaking the oracle on transient failures).
+## Nightly Registry Updates
+
+Workflow: `.github/workflows/discover-registry.yml`
+
+Schedule:
+- daily at `04:00 UTC`
+
+Required repository settings (in `bbuchsbaum/eco-registry`):
+
+1. Secret: `GH_ORG_PAT`
+- must read repos under the target owner
+- must push commits to this repo
+
+2. Variable: `ECO_OWNER`
+- owner to scan
+- supports GitHub org or user (for example `bbuchsbaum`)
+
+3. Optional variable: `ECO_ORG`
+- backward-compatible fallback
+
+## `registry.json` Contract
+
+Each entry includes:
+
+- `repo`: `owner/repo`
+- `package`
+- `language`: `R` or `Python`
+- `release_tag`: defaults to `eco-atlas`
+- `asset`: defaults to `atlas-pack.tgz`
+- `atlas_asset_url`: optional direct URL when resolvable
+- `role`, `tags`, `entrypoints`, `last_updated`
+
+Design intent:
+- `release_tag` + `asset` is the canonical contract
+- `atlas_asset_url` is convenience data
+- this makes registry generation deterministic and avoids ad-hoc entries
+
+## How Claude/Codex Uses This Registry
+
+Use this URL in MCP config:
+
+`https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/registry.json`
+
+Claude Code example:
+
+```bash
+claude mcp add eco-oracle -- npx -y eco-oracle-mcp
+```
+
+Codex example:
+
+```bash
+codex mcp add eco-oracle -- npx -y eco-oracle-mcp
+```
+
+Typical MCP env:
+
+- `ECO_REGISTRY_URL=https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/registry.json`
+- `ECO_GITHUB_TOKEN` (optional, needed for private repos/assets)
+
+## Troubleshooting
+
+1. Package not showing in `registry.json`
+- confirm `.ecosystem.yml` exists on default branch
+- confirm package `eco-atlas` release exists with `atlas-pack.tgz`
+- run discovery manually and inspect workflow logs
+
+2. Discovery runs but entry has empty `atlas_asset_url`
+- release/asset likely missing or temporarily unreachable
+- canonical `release_tag` + `asset` still present for MCP resolution
+
+3. MCP loads zero packages
+- verify MCP env points to this exact registry URL
+- call MCP tool `eco_refresh` and inspect returned `registry_source`

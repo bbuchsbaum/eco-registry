@@ -1,1 +1,45 @@
-[]
+[
+  {
+    "repo": "bbuchsbaum/bidser",
+    "package": "bidser",
+    "language": "R",
+    "release_tag": "eco-atlas",
+    "asset": "atlas-pack.tgz",
+    "atlas_asset_url": "",
+    "role": "ingest",
+    "tags": [
+      "bids",
+      "neuroimaging",
+      "fmri"
+    ],
+    "entrypoints": [
+      "bidser::bids_project",
+      "bidser::func_scans",
+      "bidser::read_events",
+      "bidser::read_confounds"
+    ],
+    "last_updated": "2026-02-20T02:18:11.129Z"
+  },
+  {
+    "repo": "bbuchsbaum/neuroim2",
+    "package": "neuroim2",
+    "language": "R",
+    "atlas_asset_url": "https://github.com/bbuchsbaum/neuroim2/releases/download/eco-atlas/atlas-pack.tgz",
+    "role": "neuroimaging",
+    "tags": [
+      "neuroimaging",
+      "fMRI",
+      "nifti",
+      "sparse",
+      "S4"
+    ],
+    "entrypoints": [
+      "neuroim2::read_vec",
+      "neuroim2::read_vol",
+      "neuroim2::NeuroVec",
+      "neuroim2::NeuroVol",
+      "neuroim2::ClusteredNeuroVec"
+    ],
+    "last_updated": "2026-02-20T01:51:55.254Z"
+  }
+]
