@@ -4,6 +4,7 @@ Canonical repository: `https://github.com/bbuchsbaum/eco-registry`
 
 This repository is the source of truth for ecosystem package discovery.
 It generates and publishes `registry.json`, which the EcoOracle MCP server consumes.
+Primary purpose: help users write new analysis/application scripts outside package development repos.
 
 ## What This Repo Owns
 
@@ -19,6 +20,7 @@ If your local workspace has a parent folder (for example `eco-oracle/`), this re
 2. Package CI publishes `atlas-pack.tgz` at release tag `eco-atlas`.
 3. This repo's discovery workflow scans all repos under an owner, finds `.ecosystem.yml`, resolves release assets, and writes `registry.json`.
 4. MCP clients read `registry.json` and load cards/symbols/edges from each package atlas.
+5. Users query the MCP tools to assemble runnable external scripts (`eco_howto`, `eco_symbol`, `eco_where_used`).
 
 ## Turnkey: Add Any New R Package
 
@@ -41,6 +43,7 @@ asset: atlas-pack.tgz
 ```
 
 2. Add package atlas workflow/tooling (from EcoOracle templates).
+The output should be user-facing usage knowledge, not package-maintainer-only internals.
 
 3. Configure package secret:
 - `OPENAI_API_KEY`
@@ -118,6 +121,11 @@ Typical MCP env:
 
 - `ECO_REGISTRY_URL=https://raw.githubusercontent.com/bbuchsbaum/eco-registry/main/registry.json`
 - `ECO_GITHUB_TOKEN` (optional, needed for private repos/assets)
+
+Typical consumer workflow in an external script project:
+1. Ask `eco_howto("How do I ...?")` for task recipes.
+2. Inspect exact APIs with `eco_symbol("pkg::fn")`.
+3. Stitch returned recipes into a script in your project.
 
 ## Troubleshooting
 
