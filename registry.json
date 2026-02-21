@@ -18,7 +18,7 @@
       "bidser::read_events",
       "bidser::read_confounds"
     ],
-    "last_updated": "2026-02-20T13:42:42.026Z"
+    "last_updated": "2026-02-21T04:32:56.128Z"
   },
   {
     "repo": "bbuchsbaum/fmridesign",
@@ -43,7 +43,7 @@
       "fmridesign::sampling_frame",
       "fmridesign::contrast_weights"
     ],
-    "last_updated": "2026-02-20T13:42:44.312Z"
+    "last_updated": "2026-02-21T04:32:58.314Z"
   },
   {
     "repo": "bbuchsbaum/fmrihrf",
@@ -97,7 +97,32 @@
       "fmrihrf::plot_hrfs",
       "fmrihrf::list_available_hrfs"
     ],
-    "last_updated": "2026-02-20T13:42:45.102Z"
+    "last_updated": "2026-02-21T04:32:59.059Z"
+  },
+  {
+    "repo": "bbuchsbaum/fmrireg",
+    "package": "fmrireg",
+    "language": "R",
+    "release_tag": "eco-atlas",
+    "asset": "atlas-pack.tgz",
+    "atlas_asset_url": "",
+    "role": "model",
+    "tags": [
+      "fmri",
+      "neuroimaging",
+      "glm",
+      "regression",
+      "hemodynamic"
+    ],
+    "entrypoints": [
+      "fmrireg::fmri_lm",
+      "fmrireg::fmri_rlm",
+      "fmrireg::fmri_model",
+      "fmrireg::fmri_meta",
+      "fmrireg::estimate_betas",
+      "fmrireg::fmri_dataset"
+    ],
+    "last_updated": "2026-02-21T04:32:59.794Z"
   },
   {
     "repo": "bbuchsbaum/neuroatlas",
@@ -135,7 +160,7 @@
       "merge_atlases",
       "filter_atlas"
     ],
-    "last_updated": "2026-02-20T13:42:49.522Z"
+    "last_updated": "2026-02-21T04:33:03.598Z"
   },
   {
     "repo": "bbuchsbaum/neuroim2",
@@ -184,6 +209,6 @@
       "parade::grid",
       "parade::schema"
     ],
-    "last_updated": "2026-02-20T13:42:51.146Z"
+    "last_updated": "2026-02-21T04:33:05.203Z"
   }
 ]
