@@ -18,7 +18,7 @@
       "bidser::read_events",
       "bidser::read_confounds"
     ],
-    "last_updated": "2026-09-07T04:11:14.508Z"
+    "last_updated": "2026-09-08T04:10:36.116Z"
   },
   {
     "repo": "bbuchsbaum/delarr",
@@ -44,7 +44,7 @@
       "delarr::delarr_hdf5",
       "delarr::hdf5_writer"
     ],
-    "last_updated": "2026-09-07T04:11:16.250Z"
+    "last_updated": "2026-09-08T04:10:38.840Z"
   },
   {
     "repo": "bbuchsbaum/fmridesign",
@@ -69,7 +69,7 @@
       "fmridesign::sampling_frame",
       "fmridesign::contrast_weights"
     ],
-    "last_updated": "2026-09-07T04:11:18.739Z"
+    "last_updated": "2026-09-08T04:10:42.917Z"
   },
   {
     "repo": "bbuchsbaum/fmrihrf",
@@ -123,7 +123,7 @@
       "fmrihrf::plot_hrfs",
       "fmrihrf::list_available_hrfs"
     ],
-    "last_updated": "2026-09-07T04:11:19.682Z"
+    "last_updated": "2026-09-08T04:10:44.247Z"
   },
   {
     "repo": "bbuchsbaum/fmrireg",
@@ -148,7 +148,7 @@
       "fmrireg::estimate_betas",
       "fmrireg::fmri_dataset"
     ],
-    "last_updated": "2026-09-07T04:11:21.221Z"
+    "last_updated": "2026-09-08T04:10:46.555Z"
   },
   {
     "repo": "bbuchsbaum/neuroatlas",
@@ -186,7 +186,7 @@
       "merge_atlases",
       "filter_atlas"
     ],
-    "last_updated": "2026-09-07T04:11:26.788Z"
+    "last_updated": "2026-09-08T04:10:56.055Z"
   },
   {
     "repo": "bbuchsbaum/neuroim2",
@@ -235,6 +235,6 @@
       "parade::grid",
       "parade::schema"
     ],
-    "last_updated": "2026-09-07T04:11:29.532Z"
+    "last_updated": "2026-09-08T04:11:00.191Z"
   }
 ]
