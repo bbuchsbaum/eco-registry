@@ -18,7 +18,34 @@
       "bidser::read_events",
       "bidser::read_confounds"
     ],
-    "last_updated": "2026-11-03T04:06:51.194Z"
+    "last_updated": "2026-11-04T04:06:24.825Z"
+  },
+  {
+    "repo": "bbuchsbaum/caravan",
+    "package": "parade",
+    "language": "R",
+    "release_tag": "eco-atlas",
+    "asset": "atlas-pack.tgz",
+    "atlas_asset_url": "https://github.com/bbuchsbaum/caravan/releases/download/eco-atlas/atlas-pack.tgz",
+    "role": "orchestrate",
+    "tags": [
+      "parallel",
+      "dataflow",
+      "hpc",
+      "slurm",
+      "future"
+    ],
+    "entrypoints": [
+      "parade::flow",
+      "parade::stage",
+      "parade::distribute",
+      "parade::collect",
+      "parade::pipeline",
+      "parade::submit_slurm",
+      "parade::grid",
+      "parade::schema"
+    ],
+    "last_updated": "2026-11-04T04:06:26.130Z"
   },
   {
     "repo": "bbuchsbaum/delarr",
@@ -44,7 +71,7 @@
       "delarr::delarr_hdf5",
       "delarr::hdf5_writer"
     ],
-    "last_updated": "2026-11-03T04:06:53.620Z"
+    "last_updated": "2026-11-04T04:06:27.567Z"
   },
   {
     "repo": "bbuchsbaum/fmridesign",
@@ -69,7 +96,7 @@
       "fmridesign::sampling_frame",
       "fmridesign::contrast_weights"
     ],
-    "last_updated": "2026-11-03T04:06:56.889Z"
+    "last_updated": "2026-11-04T04:06:30.689Z"
   },
   {
     "repo": "bbuchsbaum/fmrihrf",
@@ -123,7 +150,7 @@
       "fmrihrf::plot_hrfs",
       "fmrihrf::list_available_hrfs"
     ],
-    "last_updated": "2026-11-03T04:06:58.134Z"
+    "last_updated": "2026-11-04T04:06:31.673Z"
   },
   {
     "repo": "bbuchsbaum/fmrireg",
@@ -186,7 +213,7 @@
       "merge_atlases",
       "filter_atlas"
     ],
-    "last_updated": "2026-11-03T04:07:07.468Z"
+    "last_updated": "2026-11-04T04:06:39.717Z"
   },
   {
     "repo": "bbuchsbaum/neuroim2",
