@@ -18,7 +18,7 @@
       "bidser::read_events",
       "bidser::read_confounds"
     ],
-    "last_updated": "2026-11-08T04:06:24.725Z"
+    "last_updated": "2026-11-09T04:07:22.061Z"
   },
   {
     "repo": "bbuchsbaum/caravan",
@@ -45,7 +45,7 @@
       "parade::grid",
       "parade::schema"
     ],
-    "last_updated": "2026-11-08T04:06:26.127Z"
+    "last_updated": "2026-11-09T04:07:23.250Z"
   },
   {
     "repo": "bbuchsbaum/delarr",
@@ -71,7 +71,7 @@
       "delarr::delarr_hdf5",
       "delarr::hdf5_writer"
     ],
-    "last_updated": "2026-11-08T04:06:27.661Z"
+    "last_updated": "2026-11-09T04:07:24.595Z"
   },
   {
     "repo": "bbuchsbaum/fmridesign",
@@ -96,7 +96,7 @@
       "fmridesign::sampling_frame",
       "fmridesign::contrast_weights"
     ],
-    "last_updated": "2026-11-08T04:06:31.331Z"
+    "last_updated": "2026-11-09T04:07:27.671Z"
   },
   {
     "repo": "bbuchsbaum/fmrihrf",
@@ -150,7 +150,7 @@
       "fmrihrf::plot_hrfs",
       "fmrihrf::list_available_hrfs"
     ],
-    "last_updated": "2026-11-08T04:06:32.586Z"
+    "last_updated": "2026-11-09T04:07:28.655Z"
   },
   {
     "repo": "bbuchsbaum/fmrireg",
@@ -213,7 +213,7 @@
       "merge_atlases",
       "filter_atlas"
     ],
-    "last_updated": "2026-11-08T04:06:41.218Z"
+    "last_updated": "2026-11-09T04:07:36.911Z"
   },
   {
     "repo": "bbuchsbaum/neuroim2",
